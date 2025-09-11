@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>MapTiler Weather Map with Search</title>
+    <!-- Importing MapTiler SDK -->
+    <script src="https://cdn.maptiler.com/maptiler-sdk-js/v3.0.1/maptiler-sdk.umd.min.js"></script>
+    <link href="https://cdn.maptiler.com/maptiler-sdk-js/v3.0.1/maptiler-sdk.css" rel="stylesheet" />
+
+    <!-- Importing MapTiler Weather JS -->
+    <script src="https://cdn.maptiler.com/maptiler-weather/v3.0.1/maptiler-weather.umd.min.js"></script>
+
+    <!-- Importing MapTiler Marker Layout -->
+    <script src="https://cdn.maptiler.com/maptiler-marker-layout/v2.0.1/maptiler-marker-layout.umd.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/suncalc@1.9.0/suncalc.min.js"></script>
+
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: sans-serif;
+      }
+
+      #map {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 100%;
+      }
+
+      /* Search bar styling */
+      .search-container {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        z-index: 1000;
+        width: 300px;
+        background: white;
+        border-radius: 4px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      }
+
+      #search {
+        width: 100%;
+        padding: 10px;
+        border: none;
+        border-radius: 4px;
+        font-size: 14px;
+        outline: none;
+      }
+
+      .search-results {
+        max-height: 200px;
+        overflow-y: auto;
+        display: none;
+        border-top: 1px solid #eee;
+      }
+
+      .search-result-item {
+        padding: 8px 10px;
+        cursor: pointer;
+      }
+
+      .search-result-item:hover {
+        background-color: #f5f5f5;
+      }
+
+      /* Location button styling */
+      .location-btn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        z-index: 1000;
+        background: white;
+        border: none;
+        border-radius: 4px;
+        padding: 8px 12px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        cursor: pointer;
+      }
+
+      .location-btn:hover {
+        background: #f5f5f5;
+      }
+
+      /* Marker styling */
+      .marker {
+        position: absolute;
+        pointer-events: none;
+        color: #000;
+        line-height: 12px;
+        box-shadow: #00000040 0px 2px 10px;
+      }
+
+      .markerPointy {
+        width: 12px;
+        height: 12px;
+        background-color: #e6e6e6;
+        position: absolute;
+        transform: rotate(45deg) translate(-70%);
+        bottom: -12px;
+        left: 0;
+        right: -12px;
+        margin: auto;
+        box-shadow: #00000040 0px 2px 10px;
+      }
+
+      .markerBody {
+        position: absolute;
+        background: #e6e6e6;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        border-radius: 2px;
+      }
+
+      .markerTop {
+        border-top-left-radius: inherit;
+        border-top-right-radius: inherit;
+        width: 100%;
+        height: 20px;
+        line-height: 20px;
+        text-align: center;
+        background: #4d4d4d;
+        color: white;
+        font-size: 15px;
+        font-weight: 400;
+      }
+
+      .markerBottom {
+        border-radius: inherit;
+        width: 100%;
+        height: calc(100% - 20px);
+        display: flex;
+      }
+
+      .markerBottomLeft {
+        width: 50%;
+        height: 100%;
+        position: relative;
+      }
+
+      .markerBottomRight {
+        width: 50%;
+        height: 100%;
+        position: relative;
+      }
+
+      .markerTemperature {
+        font-size: 25px;
+        text-align: center;
+        line-height: 25px;
+        position: absolute;
+        top: 0;
+        bottom: 12%;
+        left: 0;
+        right: 0;
+        margin: auto;
+        width: fit-content;
+        height: fit-content;
+      }
+
+      .markerMainWeatherIcon {
+        width: 80%;
+        height: 80%;
+        position: absolute;
+        top: 0;
+        bottom: 0px;
+        left: 0;
+        right: 0;
+        margin: auto;
+      }
+
+      .markerPrecipitation {
+        position: absolute;
+        top: 0;
+        width: 100%;
+        height: fit-content;
+        text-align: center;
+        font-size: 10px;
+        line-height: 10px;
+        color: #4392dc;
+        padding-top: 3px;
+        font-weight: 600;
+      }
+
+      .markerWindIcon {
+        height: 25px;
+        margin-top: -9px;
+        filter: brightness(70%);
+        margin-right: -2px;
+      }
+
+      .markerWind {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        height: 13px;
+        text-align: center;
+        font-size: 10px;
+        line-height: 10px;
+        color: #6f6f6f;
+        font-weight: 400;
+        display: flex;
+        padding-left: 5px;
+      }
+
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+
+      .fade-in-animation {
+        animation: fadeIn 0.5s ease forwards;
+      }
+
+      /* Loading indicator */
+      .loading {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 5px;
+        z-index: 1000;
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    
+    <!-- Search Bar -->
+    <div class="search-container">
+      <input type="text" id="search" placeholder="Search for places...">
+      <div class="search-results" id="searchResults"></div>
+    </div>
+    
+    <!-- Current Location Button -->
+    <button class="location-btn" id="locationBtn">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+        <circle cx="12" cy="10" r="3"></circle>
+      </svg>
+    </button>
+
+    <!-- Loading indicator -->
+    <div class="loading" id="loadingIndicator">Loading weather data...</div>
+
+    <script>
+      const appContainer = document.getElementById('map');
+      const searchInput = document.getElementById('search');
+      const searchResults = document.getElementById('searchResults');
+      const locationBtn = document.getElementById('locationBtn');
+      const loadingIndicator = document.getElementById('loadingIndicator');
+
+      // Replace with your actual MapTiler API key
+      maptilersdk.config.apiKey = 'CH0eBUlfQGYuFHVX0R0l';
+
+      // Creating a map
+      const map = new maptilersdk.Map({
+        container: appContainer,
+        style: maptilersdk.MapStyle.STREETS,
+        zoom: 4.5,
+        center: [2, 40],
+        hash: true,
+        projectionControl: true
+      });
+
+      // Creating the div that will contain all the markers
+      const markerContainer = document.createElement("div");
+      appContainer.appendChild(markerContainer);
+
+      // Current Location Functionality
+      locationBtn.addEventListener('click', () => {
+        if (!navigator.geolocation) {
+          alert('Geolocation is not supported by your browser');
+          return;
+        }
+
+        locationBtn.disabled = true;
+        locationBtn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v4l3 3"></path></svg>';
+
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const { longitude, latitude } = position.coords;
+            map.flyTo({
+              center: [longitude, latitude],
+              zoom: 12,
+              essential: true
+            });
+            
+            // Add a marker at current location
+            new maptilersdk.Marker({ color: "#4285F4" })
+              .setLngLat([longitude, latitude])
+              .addTo(map);
+              
+            locationBtn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>';
+            locationBtn.disabled = false;
+          },
+          (error) => {
+            alert(`Unable to retrieve your location: ${error.message}`);
+            locationBtn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>';
+            locationBtn.disabled = false;
+          },
+          { enableHighAccuracy: true }
+        );
+      });
+
+      // Search Functionality
+      let searchTimeout;
+      searchInput.addEventListener('input', (e) => {
+        clearTimeout(searchTimeout);
+        const query = e.target.value.trim();
+        
+        if (query.length < 3) {
+          searchResults.style.display = 'none';
+          return;
+        }
+        
+        searchTimeout = setTimeout(() => {
+          maptilersdk.geocoding.forward(query, {
+            limit: 5,
+            language: 'en'
+          }).then(response => {
+            searchResults.innerHTML = '';
+            
+            if (response.features.length === 0) {
+              const noResults = document.createElement('div');
+              noResults.className = 'search-result-item';
+              noResults.textContent = 'No results found';
+              searchResults.appendChild(noResults);
+            } else {
+              response.features.forEach(feature => {
+                const resultItem = document.createElement('div');
+                resultItem.className = 'search-result-item';
+                resultItem.textContent = feature.place_name;
+                
+                resultItem.addEventListener('click', () => {
+                  map.flyTo({
+                    center: feature.center,
+                    zoom: 12,
+                    essential: true
+                  });
+                  searchResults.style.display = 'none';
+                  searchInput.value = feature.place_name;
+                });
+                
+                searchResults.appendChild(resultItem);
+              });
+            }
+            
+            searchResults.style.display = 'block';
+          }).catch(error => {
+            console.error('Geocoding error:', error);
+          });
+        }, 300);
+      });
+
+      // Close search results when clicking outside
+      document.addEventListener('click', (e) => {
+        if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+          searchResults.style.display = 'none';
+        }
+      });
+
+      // Main weather map functionality
+      (async () => {
+        loadingIndicator.style.display = 'block';
+        
+        await map.onReadyAsync();
+
+        const markerManager = new maptilermarkerlayout.MarkerLayout(map, {
+          layers: ["Capital city labels", "City labels", "Place labels", "Town labels"],
+          markerSize: [140, 80],
+          markerAnchor: "top",
+          offset: [0, -8],
+          sortingProperty: "rank",
+          filter: (feature) => {
+            return ["city", "village", "town"].includes(
+              feature.properties.class
+            );
+          },
+        });
+
+        // Weather layers with proper initialization
+        const temperatureLayer = new maptilerweather.TemperatureLayer({ 
+          opacity: 0.7,
+          colorramp: maptilerweather.ColorRamp.builtin.TEMPERATURE_CELSIUS
+        });
+        
+        const radarLayer = new maptilerweather.RadarLayer({
+          colorramp: maptilerweather.ColorRamp.builtin.RADAR_CLOUD,
+        });
+        
+        const windLayer = new maptilerweather.WindLayer({
+          colorramp: maptilerweather.ColorRamp.builtin.NULL,
+          color: [255, 255, 255, 0],
+          fastColor: [255, 255, 255, 100],
+        });
+        
+        const precipitationLayer = new maptilerweather.PrecipitationLayer({
+          colorramp: maptilerweather.ColorRamp.builtin.NULL,
+        });
+
+        map.setPaintProperty("Water", "fill-color", "rgba(0, 0, 0, 0.7)");
+        map.addLayer(temperatureLayer, "Place labels");
+        map.addLayer(windLayer);
+        map.addLayer(radarLayer);
+        map.addLayer(precipitationLayer);
+
+        await temperatureLayer.onSourceReadyAsync();
+        await radarLayer.onSourceReadyAsync();
+        await windLayer.onSourceReadyAsync();
+        await precipitationLayer.onSourceReadyAsync();
+
+        const markerLogicContainer = {};
+        let markerStatus = null;
+
+        const updateMarkers = () => {
+          markerStatus = markerManager.update();
+
+          if (!markerStatus) return;
+
+          markerStatus.removed.forEach((abstractMarker) => {
+            const markerDiv = markerLogicContainer[abstractMarker.id];
+            delete markerLogicContainer[abstractMarker.id];
+            if (markerDiv && markerDiv.parentNode) {
+              markerContainer.removeChild(markerDiv);
+            }
+          });
+
+          markerStatus.updated.forEach((abstractMarker) => {
+            const markerDiv = markerLogicContainer[abstractMarker.id];
+            updateMarkerDiv(abstractMarker, markerDiv);
+          });
+
+          markerStatus.new.forEach((abstractMarker) => {
+            const markerDiv = makeMarker(abstractMarker,
+              temperatureLayer,
+              radarLayer,
+              precipitationLayer,
+              windLayer,
+              new Date()
+            );
+            markerLogicContainer[abstractMarker.id] = markerDiv;
+            markerContainer.appendChild(markerDiv);
+          });
+        }
+
+        const softUpdateMarkers = () => {
+          if (!markerStatus) return;
+
+          markerStatus.updated.forEach((abstractMarker) => {
+            markerManager.softUpdateAbstractMarker(abstractMarker);
+            const markerDiv = markerLogicContainer[abstractMarker.id];
+            updateMarkerDiv(abstractMarker, markerDiv);
+          })
+
+          markerStatus.new.forEach((abstractMarker) => {
+            markerManager.softUpdateAbstractMarker(abstractMarker);
+            const markerDiv = markerLogicContainer[abstractMarker.id];
+            updateMarkerDiv(abstractMarker, markerDiv);
+          })
+        }
+
+        map.on("move", softUpdateMarkers);
+        map.on("moveend", updateMarkers);
+        map.once("idle", () => {
+          updateMarkers();
+          loadingIndicator.style.display = 'none';
+        });
+
+      })()
+
+      function getWeatherIcon(radarDBz, precipMmH, temperatureDeg, isDaytime) {
+        const baseUrl = "https://openweathermap.org/img/wn/";
+        
+        if (precipMmH > 5) {
+          return temperatureDeg < -1 ? 
+            `${baseUrl}13d@2x.png` : // snow
+            `${baseUrl}09d@2x.png`;  // heavy rain
+        } else if (precipMmH > 0.2) {
+          return temperatureDeg < -1 ? 
+            `${baseUrl}13d@2x.png` : // snow
+            `${baseUrl}10d@2x.png`;  // rain
+        } else if (radarDBz < 0) {
+          return isDaytime ? 
+            `${baseUrl}01d@2x.png` : // clear sky (day)
+            `${baseUrl}01n@2x.png`; // clear sky (night)
+        } else if (radarDBz < 10) {
+          return isDaytime ? 
+            `${baseUrl}02d@2x.png` : // few clouds (day)
+            `${baseUrl}02n@2x.png`; // few clouds (night)
+        } else if (radarDBz < 20) {
+          return isDaytime ? 
+            `${baseUrl}03d@2x.png` : // scattered clouds
+            `${baseUrl}03n@2x.png`;
+        } else {
+          return isDaytime ? 
+            `${baseUrl}04d@2x.png` : // broken clouds
+            `${baseUrl}04n@2x.png`;
+        }
+      }
+
+      function makeMarker(abstractMarker, temperatureLayer, radarLayer, precipitationLayer, windLayer, date) {
+        const marker = document.createElement("div");
+        marker.classList.add("marker");
+        marker.classList.add('fade-in-animation');
+        marker.style.setProperty("width", `${abstractMarker.size[0]}px`);
+        marker.style.setProperty("height", `${abstractMarker.size[1]}px`);
+        marker.style.setProperty("transform", `translate(${abstractMarker.position[0]}px, ${abstractMarker.position[1]}px)`);
+
+        const feature = abstractMarker.features[0];
+        const lonLat = feature.geometry.coordinates;
+        
+        // Get weather data with proper error handling
+        const temperatureData = temperatureLayer.pickAt(lonLat[0], lonLat[1]);
+        const precipitationData = precipitationLayer.pickAt(lonLat[0], lonLat[1]);
+        const windData = windLayer.pickAt(lonLat[0], lonLat[1]);
+        const radarData = radarLayer.pickAt(lonLat[0], lonLat[1]);
+
+        // Handle cases where data might be missing
+        const radarDBz = radarData?.value ?? -20;
+        const precipMmH = precipitationData?.value ?? 0;
+        const temperatureDeg = temperatureData?.value ?? null;
+        const windSpeed = windData?.speedKilometersPerHour ?? 0;
+        const compassDirection = windData?.compassDirection ?? '';
+        
+        // Format temperature if available
+        const temperature = temperatureDeg !== null ? temperatureDeg.toFixed(1) : '--';
+
+        const sunPosition = SunCalc.getPosition(date, lonLat[1], lonLat[0]);
+        const isDaytime = sunPosition.altitude >= 0;
+
+        const weatherIconUrl = getWeatherIcon(radarDBz, precipMmH, temperatureDeg ?? 0, isDaytime);
+        const windIconUrl = "https://openweathermap.org/img/wn/50d@2x.png";
+
+        let windDiv = "";
+        if (windSpeed > 5) {
+          windDiv = `
+          <div class="markerWind">
+            <img class="markerWindIcon" src="${windIconUrl}" alt="wind icon">${windSpeed.toFixed(0)} <span style="font-weight: 600; margin-left: 4px">${compassDirection}</span>
+          </div>
+          `
+        }
+
+        let precipDiv = "";
+        if (precipMmH > 0.1) {
+          precipDiv = `
+          <div class="markerPrecipitation">
+            ${precipMmH.toFixed(1)} mm/h
+          </div>
+          `
+        }
+
+        marker.innerHTML = `
+          <div class="markerPointy"></div>
+          <div class="markerBody">
+            <div class="markerTop">
+              ${feature.properties["name:en"] || feature.properties["name"] || 'Unknown location'}
+            </div>
+
+            <div class="markerBottom">
+              <div class="markerBottomLeft">
+                <div class="markerTemperature">${temperature}°</div>
+                ${windDiv}
+              </div>
+
+              <div class="markerBottomRight">
+                <img class="markerMainWeatherIcon" src="${weatherIconUrl}" alt="weather icon">
+                ${precipDiv}
+              </div>
+            </div>
+          </div>
+        `;
+        return marker;
+      }
+
+      function updateMarkerDiv(abstractMarker, marker) {
+        if (!marker) return;
+        
+        marker.style.setProperty("width", `${abstractMarker.size[0]}px`);
+        marker.style.setProperty("height", `${abstractMarker.size[1]}px`);
+        marker.style.setProperty("transform", `translate(${abstractMarker.position[0]}px, ${abstractMarker.position[1]}px)`);
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,1568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Smart Weather App</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #3498db;
+      --secondary: #2ecc71;
+      --danger: #e74c3c;
+      --warning: #f1c40f;
+      --info: #1abc9c;
+      --dark: #2c3e50;
+      --light: #ecf0f1;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+      color: #fff;
+    }
+    
+    /* Animated Background */
+    .background {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      background: linear-gradient(-45deg, #1e3c72, #2a5298, #0f2027, #203a43);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+    }
+    
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    
+    /* Weather Bubbles Animation */
+    .bubbles {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      overflow: hidden;
+      top: 0;
+      left: 0;
+    }
+    
+    .bubble {
+      position: absolute;
+      bottom: -100px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      animation: rise 10s infinite ease-in;
+    }
+    
+    .bubble:nth-child(1) {
+      width: 40px;
+      height: 40px;
+      left: 10%;
+      animation-duration: 8s;
+    }
+    
+    .bubble:nth-child(2) {
+      width: 20px;
+      height: 20px;
+      left: 20%;
+      animation-duration: 5s;
+      animation-delay: 1s;
+    }
+    
+    .bubble:nth-child(3) {
+      width: 50px;
+      height: 50px;
+      left: 35%;
+      animation-duration: 7s;
+      animation-delay: 2s;
+    }
+    
+    .bubble:nth-child(4) {
+      width: 80px;
+      height: 80px;
+      left: 50%;
+      animation-duration: 11s;
+      animation-delay: 0s;
+    }
+    
+    .bubble:nth-child(5) {
+      width: 35px;
+      height: 35px;
+      left: 55%;
+      animation-duration: 6s;
+      animation-delay: 1s;
+    }
+    
+    .bubble:nth-child(6) {
+      width: 45px;
+      height: 45px;
+      left: 65%;
+      animation-duration: 8s;
+      animation-delay: 3s;
+    }
+    
+    .bubble:nth-child(7) {
+      width: 25px;
+      height: 25px;
+      left: 75%;
+      animation-duration: 7s;
+      animation-delay: 2s;
+    }
+    
+    .bubble:nth-child(8) {
+      width: 80px;
+      height: 80px;
+      left: 80%;
+      animation-duration: 6s;
+      animation-delay: 1s;
+    }
+    
+    @keyframes rise {
+      0% {
+        bottom: -100px;
+        transform: translateX(0);
+      }
+      50% {
+        transform: translateX(100px);
+      }
+      100% {
+        bottom: 1080px;
+        transform: translateX(-200px);
+      }
+    }
+    
+    /* Main Card */
+    .card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      border-radius: 20px;
+      padding: 30px;
+      width: 90%;
+      max-width: 500px;
+      margin: 30px auto;
+      box-shadow: 0 25px 45px rgba(0, 0, 0, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.3s ease;
+    }
+    
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    }
+    
+    /* Search Section */
+    .search {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 25px;
+    }
+    
+    .search input {
+      flex: 1;
+      padding: 15px 20px;
+      border: none;
+      border-radius: 50px;
+      background: rgba(255, 255, 255, 0.9);
+      font-size: 16px;
+      color: #333;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+    }
+    
+    .search input:focus {
+      outline: none;
+      background: rgba(255, 255, 255, 1);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+    
+    .search button {
+      width: 50px;
+      height: 50px;
+      border: none;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.9);
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+    }
+    
+    .search button:hover {
+      background: rgba(255, 255, 255, 1);
+      transform: scale(1.05);
+    }
+    
+    .search button img {
+      width: 20px;
+      height: 20px;
+    }
+    
+    /* Weather Display */
+    .Weather {
+      text-align: center;
+    }
+    
+    .Weather-icon {
+      width: 120px;
+      height: 120px;
+      margin: 0 auto;
+      filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.2));
+      animation: float 6s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-15px); }
+      100% { transform: translateY(0px); }
+    }
+    
+    .temp {
+      font-size: 60px;
+      font-weight: 700;
+      margin: 10px 0;
+      text-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+    }
+    
+    .city {
+      font-size: 28px;
+      font-weight: 600;
+      margin: 10px 0;
+      text-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+    }
+    
+    /* Details Section */
+    .details {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 30px;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+    
+    .col {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 15px;
+      border-radius: 15px;
+      min-width: 120px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+    }
+    
+    .col:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+    
+    .col img {
+      width: 30px;
+      height: 30px;
+      filter: brightness(0) invert(1);
+    }
+    
+    .col div p:first-child {
+      font-size: 22px;
+      font-weight: 600;
+    }
+    
+    .col div p:last-child {
+      font-size: 14px;
+      opacity: 0.8;
+    }
+    
+    /* AQI Section */
+    .aqi {
+      margin-top: 20px;
+      padding: 15px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .aqi p {
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    
+    .aqi-value {
+      font-weight: 700;
+      font-size: 18px;
+    }
+    
+    .aqi-level {
+      padding: 3px 12px;
+      border-radius: 20px;
+      font-size: 14px;
+      color: white;
+      font-weight: 500;
+    }
+    
+    .aqi-good {
+      background-color: #2ecc71;
+    }
+    
+    .aqi-moderate {
+      background-color: #f1c40f;
+    }
+    
+    .aqi-unhealthy-sensitive {
+      background-color: #e67e22;
+    }
+    
+    .aqi-unhealthy {
+      background-color: #e74c3c;
+    }
+    
+    .aqi-very-unhealthy {
+      background-color: #9b59b6;
+    }
+    
+    .aqi-hazardous {
+      background-color: #7f8c8d;
+    }
+    
+    /* Pollutant Table */
+    .pollutant-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 14px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    
+    .pollutant-table th, .pollutant-table td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .pollutant-table th {
+      background: rgba(255, 255, 255, 0.15);
+      font-weight: 500;
+    }
+    
+    .pollutant-table tr:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+    
+    .pollutant-value {
+      font-weight: 600;
+    }
+    
+    .pollutant-safe {
+      color: #2ecc71;
+    }
+    
+    .pollutant-moderate {
+      color: #f1c40f;
+    }
+    
+    .pollutant-unhealthy {
+      color: #e74c3c;
+    }
+    
+    .pollutant-very-unhealthy {
+      color: #9b59b6;
+    }
+    
+    .pollutant-hazardous {
+      color: #7f8c8d;
+    }
+    
+    /* AQI Details */
+    .aqi-details {
+      margin-top: 15px;
+      padding: 15px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .aqi-details h3 {
+      margin-top: 0;
+      margin-bottom: 10px;
+      font-size: 18px;
+      font-weight: 600;
+    }
+    
+    /* Alert Messages */
+    .alert-message {
+      margin: 15px 0;
+      padding: 15px;
+      border-radius: 10px;
+      font-weight: 500;
+      display: none;
+      animation: fadeIn 0.5s ease;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .alert-danger {
+      background-color: rgba(231, 76, 60, 0.2);
+      color: #fff;
+      border-left: 4px solid #e74c3c;
+    }
+    
+    .alert-warning {
+      background-color: rgba(241, 196, 15, 0.2);
+      color: #fff;
+      border-left: 4px solid #f1c40f;
+    }
+    
+    .alert-info {
+      background-color: rgba(52, 152, 219, 0.2);
+      color: #fff;
+      border-left: 4px solid #3498db;
+    }
+    
+    /* Weather Tips */
+    .weather-tips {
+      margin-top: 15px;
+      padding: 15px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      border-left: 4px solid #3498db;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .weather-tips h3 {
+      margin-top: 0;
+      color: #3498db;
+      font-size: 18px;
+      font-weight: 600;
+    }
+    
+    .weather-tips ul {
+      padding-left: 20px;
+      margin-bottom: 0;
+    }
+    
+    .weather-tips li {
+      margin-bottom: 5px;
+    }
+    
+    /* Prediction Container */
+    .prediction-container {
+      margin-top: 20px;
+      padding: 15px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .prediction-container h3 {
+      margin-top: 0;
+      margin-bottom: 10px;
+      font-size: 18px;
+      font-weight: 600;
+    }
+    
+    #predictionResult {
+      font-weight: 600;
+      color: #2ecc71;
+      margin-bottom: 10px;
+    }
+    
+    /* Prediction Button */
+    #predictionBtn {
+      width: 100%;
+      margin-top: 20px;
+      padding: 15px;
+      background: rgba(46, 204, 113, 0.8);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    #predictionBtn:hover {
+      background: rgba(46, 204, 113, 1);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    }
+    
+    /* Error Message */
+    .error-message {
+      color: #e74c3c;
+      margin-bottom: 10px;
+      display: none;
+      font-weight: 500;
+      text-align: center;
+      padding: 10px;
+      background: rgba(231, 76, 60, 0.1);
+      border-radius: 5px;
+      animation: fadeIn 0.5s ease;
+    }
+    
+/* Voice Assistant Enhancements */
+.voice-assistant-container {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      z-index: 1000;
+    }
+    
+    .voice-assistant-btn {
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, #3498db, #2ecc71);
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      transition: all 0.3s ease;
+      border: none;
+    }
+    
+    .voice-assistant-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    }
+    
+    .voice-assistant-btn.listening {
+      animation: pulse 1.5s infinite;
+      background: linear-gradient(135deg, #e74c3c, #f39c12);
+    }
+    
+    .voice-assistant-btn img {
+      width: 30px;
+      height: 30px;
+    }
+    
+    .voice-assistant-modal {
+      position: fixed;
+      bottom: 100px;
+      right: 30px;
+      width: 320px;
+      max-height: 400px;
+      background: rgba(255,255,255,0.95);
+      border-radius: 15px;
+      padding: 15px;
+      box-shadow: 0 5px 25px rgba(0,0,0,0.2);
+      z-index: 1001;
+      display: none;
+      backdrop-filter: blur(10px);
+      flex-direction: column;
+    }
+    
+    .voice-assistant-modal.active {
+      display: flex;
+      animation: fadeIn 0.3s ease;
+    }
+    
+    .voice-assistant-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    
+    .voice-assistant-title {
+      font-weight: 600;
+      color: #2c3e50;
+    }
+    
+    .voice-assistant-close {
+      font-size: 20px;
+      cursor: pointer;
+      color: #666;
+    }
+    
+    .voice-assistant-conversation {
+      flex: 1;
+      overflow-y: auto;
+      margin-bottom: 10px;
+      padding-right: 5px;
+    }
+    
+    .message {
+      margin-bottom: 10px;
+      padding: 8px 12px;
+      border-radius: 12px;
+      max-width: 80%;
+      word-wrap: break-word;
+    }
+    
+    .user-message {
+      background: #e3f2fd;
+      margin-left: auto;
+      border-bottom-right-radius: 4px;
+    }
+    
+    .assistant-message {
+      background: #f1f1f1;
+      margin-right: auto;
+      border-bottom-left-radius: 4px;
+    }
+    
+    .voice-assistant-input {
+      display: flex;
+      gap: 8px;
+    }
+    
+    #voiceAssistantInput {
+      flex: 1;
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 20px;
+      outline: none;
+    }
+    
+    .send-btn {
+      background: #3498db;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 600px) {
+      .card {
+        padding: 20px;
+      }
+      
+      .temp {
+        font-size: 48px;
+      }
+      
+      .city {
+        font-size: 24px;
+      }
+      
+      .col {
+        min-width: 100%;
+      }
+      
+      .details {
+        flex-direction: column;
+        gap: 10px;
+      }
+      
+      .voice-assistant-modal {
+        width: 250px;
+        right: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="background"></div>
+  <div class="bubbles">
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+  </div>
+  
+  <div class="card">
+    <div class="search">
+      <div class="error-message"></div>
+      <input type="text" id="cityInput" placeholder="Enter city name" spellcheck="false"/>
+      <button id="searchBtn"><img src="images/search.png" alt="Search"/></button>
+      <button class="voice-btn" id="voiceBtn"><img src="images/microphone.png" alt="Voice Search"></button>
+      <button class="location-btn" id="locationBtn"><img src="images/location.png" alt="Location"></button>
+    </div>
+
+    <div class="Weather">
+      <img src="images/Clear.png" class="Weather-icon" alt="Weather Icon"/>
+      <h1 class="temp">--°C</h1>
+      <h2 class="city">City</h2>
+
+      <div class="details">
+        <div class="col">
+          <img src="images/humidity.png" alt="Humidity"/>
+          <div>
+            <p class="humidity">--%</p>
+            <p>Humidity</p>
+          </div>
+        </div>
+        <div class="col">
+          <img src="images/wind.png" alt="Wind Speed"/>
+          <div>
+            <p class="wind">-- km/h</p>
+            <p>Wind Speed</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="aqi">
+        <p><strong>Air Quality Index:</strong> 
+          <span class="aqi-value">--</span>
+          <span class="aqi-level"></span>
+        </p>
+      </div>
+
+      <div class="aqi-details" style="display: none;">
+        <h3>Pollutant Details (µg/m³)</h3>
+        <table class="pollutant-table">
+          <thead>
+            <tr>
+              <th>Parameter</th>
+              <th>Value</th>
+              <th>Standard</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Carbon Monoxide (CO)</td>
+              <td class="pollutant-value co-value">--</td>
+              <td>4 mg/m³ (8-hr)</td>
+              <td class="co-status">--</td>
+            </tr>
+            <tr>
+              <td>Ozone (O₃)</td>
+              <td class="pollutant-value ozone-value">--</td>
+              <td>100 µg/m³ (8-hr)</td>
+              <td class="ozone-status">--</td>
+            </tr>
+            <tr>
+              <td>Ammonia (NH₃)</td>
+              <td class="pollutant-value ammonia-value">--</td>
+              <td>200 µg/m³ (24-hr)</td>
+              <td class="ammonia-status">--</td>
+            </tr>
+            <tr>
+              <td>Benzene (C₆H₆)</td>
+              <td class="pollutant-value benzene-value">--</td>
+              <td>5 µg/m³ (annual)</td>
+              <td class="benzene-status">--</td>
+            </tr>
+            <tr>
+              <td>Sulfur Dioxide (SO₂)</td>
+              <td class="pollutant-value so2-value">--</td>
+              <td>20 µg/m³ (24-hr)</td>
+              <td class="so2-status">--</td>
+            </tr>
+            <tr>
+              <td>Nitrogen Dioxide (NO₂)</td>
+              <td class="pollutant-value no2-value">--</td>
+              <td>40 µg/m³ (annual)</td>
+              <td class="no2-status">--</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="alert-message"></div>
+      <div class="weather-tips" style="display: none;"></div>
+
+      <div class="prediction-container" style="display: none;">
+        <h3>Temperature Prediction</h3>
+        <div id="predictionResult" style="font-weight: bold; color: #2ecc71;"></div>
+        <canvas id="predictionChart" style="margin-top: 10px;"></canvas>
+      </div>
+      
+      <button id="predictionBtn" onclick="navigateToPrediction()">Advanced Prediction</button>
+
+    </div>
+  </div>
+
+  <!-- Voice Assistant Elements -->
+  <div class="voice-assistant-container">
+    <button class="voice-assistant-btn" id="voiceAssistantBtn">
+      <img src="images/voice-assistant.png" alt="Voice Assistant">
+    </button>
+    
+    <div class="voice-assistant-modal" id="voiceAssistantModal">
+      <div class="voice-assistant-header">
+        <div class="voice-assistant-title">Weather Assistant</div>
+        <div class="voice-assistant-close" id="voiceAssistantClose">&times;</div>
+      </div>
+      <div class="voice-assistant-conversation" id="voiceAssistantConversation">
+        <div class="message assistant-message">
+          Hello! I'm your weather assistant. Ask me about today's weather, temperature, humidity, or air quality.
+        </div>
+      </div>
+      <div class="voice-assistant-input">
+        <input type="text" id="voiceAssistantInput" placeholder="Type your question...">
+        <button class="send-btn" id="voiceAssistantSend">
+          <img src="images/send.png" alt="Send" width="16">
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // DOM Elements
+    const cityInput = document.getElementById('cityInput');
+    const searchBtn = document.getElementById('searchBtn');
+    const voiceBtn = document.getElementById('voiceBtn');
+    const locationBtn = document.getElementById('locationBtn');
+    const weatherIcon = document.querySelector('.Weather-icon');
+    const errorDisplay = document.querySelector('.error-message');
+    const predictionResult = document.getElementById('predictionResult');
+    const predictionContainer = document.querySelector('.prediction-container');
+    const predictionBtn = document.getElementById('predictionBtn');
+    const alertMessage = document.querySelector('.alert-message');
+    const weatherTips = document.querySelector('.weather-tips');
+    const aqiDetails = document.querySelector('.aqi-details');
+
+    // Function to navigate to prediction page
+    function navigateToPrediction() {
+      const city = document.querySelector('.city').textContent;
+      if (city && city !== 'City') {
+        window.location.href = `advanced_prediction?city=${encodeURIComponent(city)}`;
+      } else {
+        showError('Please search for a city first');
+      }
+    }
+
+    // Event Listeners
+    searchBtn.addEventListener('click', searchByCity);
+    cityInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') searchByCity();
+    });
+    locationBtn.addEventListener('click', getLocationWeather);
+    
+    // Initialize voice recognition
+    setupVoiceRecognition();
+
+    // Main weather fetching function
+    async function fetchWeather(data) {
+        try {
+            showLoading();
+            
+            const response = await fetch('/api/weather', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to fetch weather data');
+            }
+            
+            const result = await response.json();
+            
+            if (!result.success) {
+                throw new Error(result.error || 'Failed to fetch weather');
+            }
+            
+            updateWeatherUI(result);
+            hideError();
+            
+            // After getting weather, try to get prediction
+            if (data.city) {
+                await getTemperaturePrediction(data.city);
+            }
+        } catch (error) {
+            showError(error.message);
+            console.error("Weather fetch error:", error);
+        } finally {
+            hideLoading();
+        }
+    }
+
+    // Get temperature prediction
+    async function getTemperaturePrediction(city) {
+        try {
+            const response = await fetch(`/api/predict-temp?city=${encodeURIComponent(city)}`);
+            
+            if (!response.ok) {
+                throw new Error('Failed to get prediction');
+            }
+            
+            const result = await response.json();
+            
+            if (!result.success) {
+                predictionContainer.style.display = 'none';
+                return;
+            }
+            
+            predictionContainer.style.display = 'block';
+            predictionResult.textContent = `Predicted temperature for next day: ${result.predicted_temp}°C`;
+            
+            // Render chart
+            renderPredictionChart(result.days, result.temps, result.predicted_temp);
+        } catch (error) {
+            console.error("Prediction error:", error);
+            predictionContainer.style.display = 'none';
+        }
+    }
+
+    // Render prediction chart
+    function renderPredictionChart(days, temps, predictedTemp) {
+        const ctx = document.getElementById('predictionChart').getContext('2d');
+        
+        if (window.predictionChart) {
+            window.predictionChart.destroy();
+        }
+        
+        window.predictionChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [...days.map(d => `Day ${d}`), 'Next Day'],
+                datasets: [{
+                    label: 'Temperature (°C)',
+                    data: [...temps, predictedTemp],
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Temperature Trend and Prediction'
+                    }
+                }
+            }
+        });
+    }
+
+    // Update UI with weather data
+    function updateWeatherUI(data) {
+        document.querySelector('.city').textContent = data.name;
+        const temp = Math.round(data.main.temp);
+        document.querySelector('.temp').textContent = `${temp}°C`;
+        document.querySelector('.humidity').textContent = `${data.main.humidity}%`;
+        document.querySelector('.wind').textContent = `${data.wind.speed} km/h`;
+        
+        // Update AQI display
+        if (data.air_quality !== undefined && data.air_quality !== null) {
+            updateAQIDisplay(data.air_quality);
+            aqiDetails.style.display = 'block';
+        } else {
+            document.querySelector('.aqi-value').textContent = '--';
+            document.querySelector('.aqi-level').textContent = '';
+            document.querySelector('.aqi-level').className = 'aqi-level';
+            aqiDetails.style.display = 'none';
+        }
+        
+        // Update pollutant data if available
+        if (data.pollutants) {
+            updatePollutantData(data.pollutants);
+        }
+        
+        const weatherMain = data.weather[0].main.toLowerCase();
+        const iconMap = {
+            'clouds': 'clouds.png',
+            'clear': 'clear.png',
+            'rain': 'rain.png',
+            'drizzle': 'drizzle.png',
+            'mist': 'mist.png',
+            'snow': 'snow.png',
+            'thunderstorm': 'thunderstorm.png'
+        };
+        weatherIcon.src = `images/${iconMap[weatherMain] || 'clear.png'}`;
+
+        // Show alerts and tips based on weather conditions
+        showWeatherAlerts(temp, weatherMain, data.wind.speed, data.main.humidity);
+        showWeatherTips(temp, weatherMain, data.wind.speed, data.main.humidity);
+    }
+
+    // Update AQI display
+    function updateAQIDisplay(aqi) {
+        const aqiValue = document.querySelector('.aqi-value');
+        const aqiLevel = document.querySelector('.aqi-level');
+        
+        aqiValue.textContent = aqi;
+        
+        // Remove all classes
+        aqiLevel.className = 'aqi-level';
+        
+        // Add appropriate class based on AQI value
+        if (aqi >= 1 && aqi <= 50) {
+            aqiLevel.textContent = 'Good';
+            aqiLevel.classList.add('aqi-good');
+        } else if (aqi <= 100) {
+            aqiLevel.textContent = 'Moderate';
+            aqiLevel.classList.add('aqi-moderate');
+        } else if (aqi <= 150) {
+            aqiLevel.textContent = 'Unhealthy for Sensitive Groups';
+            aqiLevel.classList.add('aqi-unhealthy-sensitive');
+        } else if (aqi <= 200) {
+            aqiLevel.textContent = 'Unhealthy';
+            aqiLevel.classList.add('aqi-unhealthy');
+        } else if (aqi <= 300) {
+            aqiLevel.textContent = 'Very Unhealthy';
+            aqiLevel.classList.add('aqi-very-unhealthy');
+        } else {
+            aqiLevel.textContent = 'Hazardous';
+            aqiLevel.classList.add('aqi-hazardous');
+        }
+        
+        // Add AQI to weather alerts
+        addAQIAlerts(aqi);
+    }
+
+    // Update pollutant data
+    function updatePollutantData(pollutants) {
+        // CO (convert from mg/m³ to µg/m³ for display)
+        const coValue = pollutants.co ? (pollutants.co * 1000).toFixed(2) : '--';
+        document.querySelector('.co-value').textContent = coValue;
+        updatePollutantStatus('.co-status', pollutants.co, 4, 'mg/m³');
+        
+        // Ozone (O₃)
+        document.querySelector('.ozone-value').textContent = pollutants.o3 ? pollutants.o3.toFixed(2) : '--';
+        updatePollutantStatus('.ozone-status', pollutants.o3, 100, 'µg/m³');
+        
+        // Ammonia (NH₃)
+        document.querySelector('.ammonia-value').textContent = pollutants.nh3 ? pollutants.nh3.toFixed(2) : '--';
+        updatePollutantStatus('.ammonia-status', pollutants.nh3, 200, 'µg/m³');
+        
+        // Benzene (C₆H₆)
+        document.querySelector('.benzene-value').textContent = pollutants.c6h6 ? pollutants.c6h6.toFixed(2) : '--';
+        updatePollutantStatus('.benzene-status', pollutants.c6h6, 5, 'µg/m³');
+        
+        // Sulfur Dioxide (SO₂)
+        document.querySelector('.so2-value').textContent = pollutants.so2 ? pollutants.so2.toFixed(2) : '--';
+        updatePollutantStatus('.so2-status', pollutants.so2, 20, 'µg/m³');
+        
+        // Nitrogen Dioxide (NO₂)
+        document.querySelector('.no2-value').textContent = pollutants.no2 ? pollutants.no2.toFixed(2) : '--';
+        updatePollutantStatus('.no2-status', pollutants.no2, 40, 'µg/m³');
+    }
+
+    // Update pollutant status with color coding
+    function updatePollutantStatus(selector, value, standard, unit) {
+        const element = document.querySelector(selector);
+        if (value === undefined || value === null) {
+            element.textContent = '--';
+            element.className = selector.replace('.', '') + ' pollutant-safe';
+            return;
+        }
+        
+        // Remove all classes
+        element.className = selector.replace('.', '');
+        
+        // Add appropriate class based on value
+        if (value <= standard * 0.5) {
+            element.textContent = 'Good';
+            element.classList.add('pollutant-safe');
+        } else if (value <= standard) {
+            element.textContent = 'Moderate';
+            element.classList.add('pollutant-moderate');
+        } else if (value <= standard * 1.5) {
+            element.textContent = 'Unhealthy';
+            element.classList.add('pollutant-unhealthy');
+        } else if (value <= standard * 2) {
+            element.textContent = 'Very Unhealthy';
+            element.classList.add('pollutant-very-unhealthy');
+        } else {
+            element.textContent = 'Hazardous';
+            element.classList.add('pollutant-hazardous');
+        }
+    }
+
+    // Add AQI alerts
+    function addAQIAlerts(aqi) {
+        if (aqi >= 150) {
+            // Only show if there isn't already a more severe alert
+            if (!alertMessage.style.display || alertMessage.style.display === 'none') {
+                alertMessage.textContent = `⚠️ Poor Air Quality (${getAQIDescription(aqi)})! Consider limiting outdoor activities.`;
+                alertMessage.className = 'alert-message alert-warning';
+                alertMessage.style.display = 'block';
+            }
+        }
+    }
+
+    function getAQIDescription(aqi) {
+        if (aqi >= 1 && aqi <= 50) return 'Good';
+        if (aqi <= 100) return 'Moderate';
+        if (aqi <= 150) return 'Unhealthy for Sensitive Groups';
+        if (aqi <= 200) return 'Unhealthy';
+        if (aqi <= 300) return 'Very Unhealthy';
+        return 'Hazardous';
+    }
+
+    // Show weather alerts
+    function showWeatherAlerts(temp, weatherCondition, windSpeed, humidity) {
+        // Clear previous alerts
+        alertMessage.style.display = 'none';
+        alertMessage.className = 'alert-message';
+        alertMessage.textContent = '';
+        
+        // Check conditions in order of priority
+        if (weatherCondition === 'thunderstorm') {
+            alertMessage.textContent = '⚠️ Thunderstorm warning! Stay indoors if possible.';
+            alertMessage.className = 'alert-message alert-danger';
+        } 
+        else if (weatherCondition === 'snow') {
+            alertMessage.textContent = '⚠️ Snow alert! Drive carefully and dress warmly.';
+            alertMessage.className = 'alert-message alert-warning';
+        }
+        else if (temp >= 35) {
+            alertMessage.textContent = '⚠️ Heat warning! Stay hydrated and avoid prolonged sun exposure.';
+            alertMessage.className = 'alert-message alert-danger';
+        }
+        else if (temp <= 0) {
+            alertMessage.textContent = '⚠️ Freezing temperatures! Dress in layers and protect exposed skin.';
+            alertMessage.className = 'alert-message alert-warning';
+        }
+        else if (windSpeed > 30) {
+            alertMessage.textContent = '⚠️ High winds! Secure loose objects and be cautious outdoors.';
+            alertMessage.className = 'alert-message alert-warning';
+        }
+        else if (humidity > 80) {
+            alertMessage.textContent = 'ℹ️ High humidity expected. May feel warmer than actual temperature.';
+            alertMessage.className = 'alert-message alert-info';
+        }
+        
+        // Only display if there's a message
+        if (alertMessage.textContent) {
+            alertMessage.style.display = 'block';
+        }
+    }
+
+    // Show weather tips
+    function showWeatherTips(temp, weatherCondition, windSpeed, humidity) {
+        weatherTips.style.display = 'block';
+        let tipsHTML = '<h3>Weather Tips</h3><ul>';
+        
+        // Temperature-based tips
+        if (temp >= 30) {
+            tipsHTML += '<li>Wear lightweight, light-colored clothing</li>';
+            tipsHTML += '<li>Drink plenty of water to stay hydrated</li>';
+            tipsHTML += '<li>Apply sunscreen with SPF 30+</li>';
+        } 
+        else if (temp <= 5) {
+            tipsHTML += '<li>Dress in layers to retain body heat</li>';
+            tipsHTML += '<li>Wear a hat and gloves to prevent heat loss</li>';
+            tipsHTML += '<li>Check for frostbite on exposed skin</li>';
+        }
+        
+        // Weather condition tips
+        if (weatherCondition === 'rain' || weatherCondition === 'drizzle') {
+            tipsHTML += '<li>Carry an umbrella or wear waterproof clothing</li>';
+            tipsHTML += '<li>Allow extra travel time for wet conditions</li>';
+        }
+        else if (weatherCondition === 'snow') {
+            tipsHTML += '<li>Wear waterproof boots with good traction</li>';
+            tipsHTML += '<li>Be cautious of black ice on roads/sidewalks</li>';
+        }
+        else if (weatherCondition === 'clear') {
+            tipsHTML += '<li>Great day for outdoor activities</li>';
+            tipsHTML += '<li>Consider sunglasses for eye protection</li>';
+        }
+        
+        // Wind tips
+        if (windSpeed > 20) {
+            tipsHTML += '<li>Secure loose outdoor items that could blow away</li>';
+            tipsHTML += '<li>Be cautious of flying debris</li>';
+        }
+        
+        tipsHTML += '</ul>';
+        weatherTips.innerHTML = tipsHTML;
+    }
+
+    // Voice recognition
+    function setupVoiceRecognition() {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+            voiceBtn.style.display = 'none';
+            return;
+        }
+
+        const recognition = new SpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = 'en-US';
+
+        voiceBtn.addEventListener('click', () => {
+            try {
+                recognition.start();
+                voiceBtn.innerHTML = '<img src="images/mic-active.png" alt="Listening">';
+                showLoading();
+            } catch (e) {
+                showError("Voice recognition failed to start");
+            }
+        });
+
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript.trim();
+            cityInput.value = transcript;
+            voiceBtn.innerHTML = '<img src="images/microphone.png" alt="Voice Search">';
+            searchByCity();
+        };
+
+        recognition.onerror = (event) => {
+            voiceBtn.innerHTML = '<img src="images/microphone.png" alt="Voice Search">';
+            showError(`Voice error: ${event.error}`);
+            hideLoading();
+        };
+    }
+
+    // Location-based weather
+    async function getLocationWeather() {
+        return new Promise((resolve, reject) => {
+            if (!navigator.geolocation) {
+                reject("Geolocation not supported");
+                return;
+            }
+
+            showLoading();
+            
+            navigator.geolocation.getCurrentPosition(
+                async (position) => {
+                    try {
+                        await fetchWeather({
+                            lat: position.coords.latitude,
+                            lon: position.coords.longitude
+                        });
+                        hideError();
+                        resolve();
+                    } catch (error) {
+                        reject(error);
+                    } finally {
+                        hideLoading();
+                    }
+                },
+                (error) => {
+                    let errorMsg;
+                    switch(error.code) {
+                        case error.PERMISSION_DENIED:
+                            errorMsg = "Location access denied. Please enable permissions.";
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            errorMsg = "Location information unavailable.";
+                            break;
+                        case error.TIMEOUT:
+                            errorMsg = "Location request timed out.";
+                            break;
+                        default:
+                            errorMsg = "Failed to get location.";
+                    }
+                    reject(errorMsg);
+                    hideLoading();
+                },
+                { timeout: 10000 }
+            );
+        });
+    }
+
+    // Search by city name
+    async function searchByCity() {
+        const city = cityInput.value.trim();
+        if (!city) {
+            showError('Please enter a city name');
+            return;
+        }
+        try {
+            await fetchWeather({ city });
+        } catch (error) {
+            showError(error.message);
+        }
+    }
+
+    // UI Helpers
+    function showLoading() {
+        document.querySelector('.temp').textContent = 'Loading...';
+    }
+
+    function hideLoading() {
+        // Will be updated by actual data
+    }
+
+    function showError(message) {
+        errorDisplay.textContent = message;
+        errorDisplay.style.display = 'block';
+    }
+
+    function hideError() {
+        errorDisplay.style.display = 'none';
+    }
+
+    // Enhanced Voice Assistant Class
+    // Enhanced WeatherVoiceAssistant class
+class WeatherVoiceAssistant {
+  constructor() {
+    this.recognition = null;
+    this.isListening = false;
+    this.speechSynthesis = window.speechSynthesis;
+    this.conversation = [];
+    this.currentWeatherData = null;
+    this.init();
+  }
+
+  init() {
+    if ('webkitSpeechRecognition' in window) {
+      this.recognition = new webkitSpeechRecognition();
+      this.recognition.continuous = false;
+      this.recognition.interimResults = false;
+      this.recognition.lang = 'en-US';
+
+      this.recognition.onstart = () => {
+        this.isListening = true;
+        this.updateUI(true);
+        this.addAssistantMessage("I'm listening...");
+      };
+
+      this.recognition.onresult = async (event) => {
+        const transcript = event.results[0][0].transcript;
+        this.addUserMessage(transcript);
+        await this.processWeatherQuery(transcript);
+      };
+
+      this.recognition.onerror = (event) => {
+        console.error('Voice recognition error:', event.error);
+        this.addAssistantMessage("Sorry, I didn't catch that. Please try again.");
+        this.updateUI(false);
+      };
+
+      this.recognition.onend = () => {
+        this.isListening = false;
+        this.updateUI(false);
+      };
+    } else {
+      console.warn('Web Speech API not supported');
+      this.addAssistantMessage("Voice commands not supported in your browser");
+    }
+
+    // Setup text input
+    document.getElementById('voiceAssistantInput').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        this.handleTextInput();
+      }
+    });
+
+    document.getElementById('voiceAssistantSend').addEventListener('click', () => {
+      this.handleTextInput();
+    });
+  }
+
+  async speakWeatherDetails(weatherData) {
+    if (!weatherData || !this.speechSynthesis) return;
+    
+    try {
+      // Try to get AI-generated speech first
+      const response = await fetch('/api/generate-weather-speech', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ weather_data: weatherData })
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          this.speak(data.speech_text);
+          return;
+        }
+      }
+      
+      // Fallback to basic speech generation
+      const basicMessage = this.generateBasicWeatherSpeech(weatherData);
+      this.speak(basicMessage);
+      
+    } catch (error) {
+      console.error("Failed to generate speech:", error);
+      const basicMessage = this.generateBasicWeatherSpeech(weatherData);
+      this.speak(basicMessage);
+    }
+  }
+
+  generateBasicWeatherSpeech(weatherData) {
+    let message = `Current weather in ${weatherData.name}: `;
+    message += `${Math.round(weatherData.main.temp)} degrees Celsius, `;
+    message += `feels like ${Math.round(weatherData.main.feels_like)}. `;
+    message += `Conditions: ${weatherData.weather[0].description}. `;
+    message += `Humidity: ${weatherData.main.humidity} percent. `;
+    message += `Wind: ${Math.round(weatherData.wind.speed)} km/h from ${weatherData.wind.direction}. `;
+    
+    if (weatherData.air_quality) {
+      message += `Air quality is ${this.getAQIDescription(weatherData.air_quality)}. `;
+    }
+    
+    // Add time-based greetings
+    const hours = new Date().getHours();
+    if (hours < 12) {
+      message = "Good morning! " + message;
+    } else if (hours < 18) {
+      message = "Good afternoon! " + message;
+    } else {
+      message = "Good evening! " + message;
+    }
+    
+    return message;
+  }
+
+  getAQIDescription(aqi) {
+    if (aqi >= 1 && aqi <= 50) return 'good';
+    if (aqi <= 100) return 'moderate';
+    if (aqi <= 150) return 'unhealthy for sensitive groups';
+    if (aqi <= 200) return 'unhealthy';
+    if (aqi <= 300) return 'very unhealthy';
+    return 'hazardous';
+  }
+
+  async processWeatherQuery(query) {
+    try {
+      // Check if we need to fetch weather data
+      if (!this.currentWeatherData || 
+          query.toLowerCase().includes('current location') || 
+          query.toLowerCase().includes('weather in')) {
+        
+        // Extract location if mentioned
+        let location = null;
+        const locationMatch = query.match(/(?:weather|forecast) (?:in|for) (.+)/i);
+        if (locationMatch && locationMatch[1]) {
+          location = locationMatch[1].trim();
+        } else if (document.querySelector('.city').textContent !== 'City') {
+          location = document.querySelector('.city').textContent;
+        }
+
+        if (location) {
+          this.addAssistantMessage(`Checking weather for ${location}...`);
+          document.getElementById('cityInput').value = location;
+          await searchByCity();
+        } else if (query.toLowerCase().includes('current location')) {
+          this.addAssistantMessage("Getting weather for your current location...");
+          await getLocationWeather();
+        } else {
+          this.addAssistantMessage("Please specify a location or check the weather first");
+          return;
+        }
+      }
+
+      // Get comprehensive weather response
+      const response = await fetch('/api/chatgpt-weather', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          query,
+          weather_data: this.getCurrentWeatherSummary()
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to get assistant response');
+      }
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        this.addAssistantMessage(data.response);
+        this.speak(data.response);
+      } else {
+        this.addAssistantMessage("Sorry, I couldn't process that weather request.");
+      }
+    } catch (error) {
+      console.error('Error processing query:', error);
+      this.addAssistantMessage("Sorry, I encountered an error processing your request.");
+    }
+  }
+
+  speak(text) {
+    if (this.speechSynthesis) {
+      // Cancel any ongoing speech
+      this.speechSynthesis.cancel();
+      
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = 0.9;
+      utterance.pitch = 1.0;
+      utterance.volume = 1.0;
+      this.speechSynthesis.speak(utterance);
+    }
+  }
+
+  // ... (keep other existing methods like updateUI, addUserMessage, etc.)
+}
+
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+  window.voiceAssistant = new WeatherVoiceAssistant();
+  
+  // Connect voice assistant button
+  document.getElementById('voiceAssistantBtn').addEventListener('click', () => {
+    window.voiceAssistant.toggleModal();
+    if (!window.voiceAssistant.isListening) {
+      window.voiceAssistant.startListening();
+    }
+  });
+  
+  // Close modal button
+  document.getElementById('voiceAssistantClose').addEventListener('click', () => {
+    window.voiceAssistant.toggleModal();
+  });
+
+  // Modify updateWeatherUI to trigger voice assistant
+  const originalUpdateWeatherUI = updateWeatherUI;
+  updateWeatherUI = function(data) {
+    originalUpdateWeatherUI(data);
+    window.voiceAssistant.currentWeatherData = data;
+    window.voiceAssistant.speakWeatherDetails(data);
+  };
+});
+
+// Modify searchByCity to ensure voice assistant speaks
+async function searchByCity() {
+  const city = document.getElementById('cityInput').value.trim();
+  if (!city) {
+    showError('Please enter a city name');
+    return;
+  }
+  try {
+    await fetchWeather({ city });
+  } catch (error) {
+    showError(error.message);
+  }
+  
+}
+  </script>
+  <script src="script.js" defer></script>
+</body>
+</html>

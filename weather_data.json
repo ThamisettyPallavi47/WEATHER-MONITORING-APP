@@ -1,0 +1,235 @@
+{
+  "london": [
+    {
+      "timestamp": "2025-09-11T15:14:39.000618",
+      "temp": 32,
+      "humidity": 50,
+      "windspeed": 2.92,
+      "pressure": 1004,
+      "aqi": 2,
+      "precipitation": 7.2
+    },
+    {
+      "timestamp": "2025-09-11T15:15:12.778437",
+      "temp": 16,
+      "humidity": 68,
+      "windspeed": 6.14,
+      "pressure": 1003,
+      "aqi": 2,
+      "precipitation": 188.6
+    },
+    {
+      "timestamp": "2025-09-11T15:15:17.438799",
+      "temp": 16,
+      "humidity": 68,
+      "windspeed": 6.14,
+      "pressure": 1003,
+      "aqi": 2,
+      "precipitation": 198.9
+    },
+    {
+      "timestamp": "2025-09-11T15:16:27.727864",
+      "temp": 32,
+      "humidity": 51,
+      "windspeed": 2.29,
+      "pressure": 1004,
+      "aqi": 2,
+      "precipitation": 8.9
+    },
+    {
+      "timestamp": "2025-09-11T15:16:28.024305",
+      "temp": 32,
+      "humidity": 51,
+      "windspeed": 2.29,
+      "pressure": 1004,
+      "aqi": 2,
+      "precipitation": 8.9
+    },
+    {
+      "timestamp": "2025-09-11T15:16:37.211425",
+      "temp": 16,
+      "humidity": 68,
+      "windspeed": 6.14,
+      "pressure": 1003,
+      "aqi": 2,
+      "precipitation": 283.9
+    },
+    {
+      "timestamp": "2025-09-11T15:16:43.556101",
+      "temp": 32,
+      "humidity": 51,
+      "windspeed": 2.29,
+      "pressure": 1004,
+      "aqi": 2,
+      "precipitation": 1294.5
+    },
+    {
+      "timestamp": "2025-09-11T15:16:53.162313",
+      "temp": 16,
+      "humidity": 68,
+      "windspeed": 6.14,
+      "pressure": 1003,
+      "aqi": 2,
+      "precipitation": 394.9
+    },
+    {
+      "timestamp": "2025-09-11T15:31:01.950885",
+      "temp": 32,
+      "humidity": 50,
+      "windspeed": 2.92,
+      "pressure": 1004,
+      "aqi": 2,
+      "precipitation": 7.2
+    },
+    {
+      "timestamp": "2025-09-11T15:31:10.903577",
+      "temp": 17,
+      "humidity": 67,
+      "windspeed": 6.14,
+      "pressure": 1003,
+      "aqi": 2,
+      "precipitation": 695.4
+    }
+  ],
+  "chittoor": [
+    {
+      "timestamp": "2025-04-18T21:08:57.536733",
+      "temp": 30,
+      "humidity": 66,
+      "windspeed": 5.1,
+      "pressure": 1008,
+      "aqi": 3,
+      "precipitation": 23.4
+    },
+    {
+      "timestamp": "2025-04-18T21:08:59.087683",
+      "temp": 30,
+      "humidity": 66,
+      "windspeed": 5.1,
+      "pressure": 1008,
+      "aqi": 3,
+      "precipitation": 35.8
+    },
+    {
+      "timestamp": "2025-04-25T11:18:44.682219",
+      "temp": 36,
+      "humidity": 29,
+      "windspeed": 4.15,
+      "pressure": 1009,
+      "aqi": 3,
+      "precipitation": 896.7
+    },
+    {
+      "timestamp": "2025-07-27T11:50:51.590161",
+      "temp": 32,
+      "humidity": 47,
+      "windspeed": 7.78,
+      "pressure": 1007,
+      "aqi": 1,
+      "precipitation": 877.0
+    },
+    {
+      "timestamp": "2025-07-27T11:54:38.641569",
+      "temp": 32,
+      "humidity": 47,
+      "windspeed": 7.78,
+      "pressure": 1007,
+      "aqi": 1,
+      "precipitation": 623.8
+    },
+    {
+      "timestamp": "2025-09-11T14:37:53.517176",
+      "temp": 32,
+      "humidity": 53,
+      "windspeed": 3.89,
+      "pressure": 1004,
+      "aqi": 2,
+      "precipitation": 932.6
+    },
+    {
+      "timestamp": "2025-09-11T15:02:52.187633",
+      "temp": 32,
+      "humidity": 50,
+      "windspeed": 2.92,
+      "pressure": 1004,
+      "aqi": 2,
+      "precipitation": 7.3
+    },
+    {
+      "timestamp": "2025-09-11T15:15:22.330517",
+      "temp": 32,
+      "humidity": 50,
+      "windspeed": 2.92,
+      "pressure": 1004,
+      "aqi": 2,
+      "precipitation": 1725.8
+    },
+    {
+      "timestamp": "2025-09-11T15:17:04.196479",
+      "temp": 32,
+      "humidity": 50,
+      "windspeed": 2.92,
+      "pressure": 1004,
+      "aqi": 2,
+      "precipitation": 1140.9
+    },
+    {
+      "timestamp": "2025-09-11T15:31:17.798530",
+      "temp": 32,
+      "humidity": 50,
+      "windspeed": 2.92,
+      "pressure": 1004,
+      "aqi": 2,
+      "precipitation": 468.5
+    }
+  ],
+  "kadiri": [
+    {
+      "timestamp": "2025-04-18T16:48:59.963393",
+      "temp": 36,
+      "humidity": 27,
+      "windspeed": 2.6,
+      "pressure": 1004,
+      "aqi": 3,
+      "precipitation": 0.2
+    },
+    {
+      "timestamp": "2025-04-18T16:54:57.438344",
+      "temp": 36,
+      "humidity": 27,
+      "windspeed": 2.6,
+      "pressure": 1004,
+      "aqi": 3,
+      "precipitation": 0.2
+    },
+    {
+      "timestamp": "2025-04-18T16:58:27.051090",
+      "temp": 36,
+      "humidity": 27,
+      "windspeed": 2.6,
+      "pressure": 1004,
+      "aqi": 3,
+      "precipitation": 0.2
+    }
+  ],
+  "new york": [
+    {
+      "timestamp": "2025-04-18T21:01:05.823188",
+      "temp": 18,
+      "humidity": 36,
+      "windspeed": 4.22,
+      "pressure": 1024,
+      "aqi": 2,
+      "precipitation": 11.6
+    },
+    {
+      "timestamp": "2025-04-18T21:01:07.923440",
+      "temp": 18,
+      "humidity": 36,
+      "windspeed": 4.22,
+      "pressure": 1024,
+      "aqi": 2,
+      "precipitation": 11.6
+    }
+  ]
+}
