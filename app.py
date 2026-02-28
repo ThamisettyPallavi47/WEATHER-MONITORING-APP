@@ -786,5 +786,5 @@ def update_prediction():
     else:
         return jsonify({"status": "error", "message": "Unsupported prediction type"}), 400
 
-if __name__ == '__main__':
-    app.run(port=3000, debug=True)
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000)

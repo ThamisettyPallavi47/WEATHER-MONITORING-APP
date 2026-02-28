@@ -1,42 +1,6 @@
 {
   "london": [
     {
-      "timestamp": "2025-09-11T15:14:39.000618",
-      "temp": 32,
-      "humidity": 50,
-      "windspeed": 2.92,
-      "pressure": 1004,
-      "aqi": 2,
-      "precipitation": 7.2
-    },
-    {
-      "timestamp": "2025-09-11T15:15:12.778437",
-      "temp": 16,
-      "humidity": 68,
-      "windspeed": 6.14,
-      "pressure": 1003,
-      "aqi": 2,
-      "precipitation": 188.6
-    },
-    {
-      "timestamp": "2025-09-11T15:15:17.438799",
-      "temp": 16,
-      "humidity": 68,
-      "windspeed": 6.14,
-      "pressure": 1003,
-      "aqi": 2,
-      "precipitation": 198.9
-    },
-    {
-      "timestamp": "2025-09-11T15:16:27.727864",
-      "temp": 32,
-      "humidity": 51,
-      "windspeed": 2.29,
-      "pressure": 1004,
-      "aqi": 2,
-      "precipitation": 8.9
-    },
-    {
       "timestamp": "2025-09-11T15:16:28.024305",
       "temp": 32,
       "humidity": 51,
@@ -89,6 +53,42 @@
       "pressure": 1003,
       "aqi": 2,
       "precipitation": 695.4
+    },
+    {
+      "timestamp": "2026-02-28T14:45:45.723116",
+      "temp": 34,
+      "humidity": 22,
+      "windspeed": 3.43,
+      "pressure": 1006,
+      "aqi": 3,
+      "precipitation": 0
+    },
+    {
+      "timestamp": "2026-02-28T14:46:05.194129",
+      "temp": 7,
+      "humidity": 88,
+      "windspeed": 5.8,
+      "pressure": 1013,
+      "aqi": 2,
+      "precipitation": 1256.3
+    },
+    {
+      "timestamp": "2026-02-28T14:47:02.709399",
+      "temp": 31,
+      "humidity": 25,
+      "windspeed": 3.19,
+      "pressure": 1006,
+      "aqi": 3,
+      "precipitation": 5158.0
+    },
+    {
+      "timestamp": "2026-02-28T14:47:37.329862",
+      "temp": 7,
+      "humidity": 88,
+      "windspeed": 5.8,
+      "pressure": 1013,
+      "aqi": 2,
+      "precipitation": 7957.4
     }
   ],
   "chittoor": [
@@ -210,6 +210,24 @@
       "pressure": 1004,
       "aqi": 3,
       "precipitation": 0.2
+    },
+    {
+      "timestamp": "2026-02-28T14:46:25.599470",
+      "temp": 34,
+      "humidity": 22,
+      "windspeed": 3.43,
+      "pressure": 1006,
+      "aqi": 3,
+      "precipitation": 2407.4
+    },
+    {
+      "timestamp": "2026-02-28T14:46:30.628621",
+      "temp": 34,
+      "humidity": 22,
+      "windspeed": 3.43,
+      "pressure": 1006,
+      "aqi": 3,
+      "precipitation": 2407.4
     }
   ],
   "new york": [
